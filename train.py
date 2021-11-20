@@ -28,7 +28,8 @@ from pytorch_lightning.loggers import TestTubeLogger
 class NeRFSystem(LightningModule):
     def __init__(self, hparams):
         super(NeRFSystem, self).__init__()
-        self.hparams = hparams
+        # self.hparams = hparams
+        self.save_hyperparameters(hparams)
 
         self.loss = loss_dict['color'](coef=1)
 
@@ -152,11 +153,12 @@ class NeRFSystem(LightningModule):
 def main(hparams):
     system = NeRFSystem(hparams)
     checkpoint_callback = \
-        ModelCheckpoint(filepath=os.path.join(f'ckpts/{hparams.exp_name}',
-                                               '{epoch:d}'),
-                        monitor='val/psnr',
-                        mode='max',
-                        save_top_k=5)
+        ModelCheckpoint(
+            dirpath=f'ckpts/{hparams.exp_name}',
+            filename='{epoch:d}',
+            monitor='val/psnr',
+            mode='max',
+            save_top_k=5)
 
     logger = TestTubeLogger(save_dir="logs",
                             name=hparams.exp_name,
